@@ -1,5 +1,6 @@
 package myProject;
 
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -16,7 +17,7 @@ public class GUI_BatallaNaval extends JFrame {
     //Botones
     private JButton botonPVP, botonPVC;
     private Header headerProject;
-    private JPanel panelTablero, panelBotones, panelLogo;
+    private JPanel panelTablero, panelBotones, panelLogo, panelMain;
     private ImageIcon tablero, bg, logo, imagen;
     private JLabel labelTablero, labelBg, labelLogo;
     private Escucha escucha;
@@ -39,10 +40,11 @@ public class GUI_BatallaNaval extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setIconImage(new ImageIcon(getClass().getResource(PATH+"icon.png")).getImage());
 
-        //bg
-        bg = new ImageIcon(getClass().getResource(PATH+"bg-2.jpg"));
+        //Background
+        bg = new ImageIcon(getClass().getResource(PATH+"bg-3.jpg"));
         labelBg = new JLabel("",bg,JLabel.CENTER);
         labelBg.setBounds(0,0,1920,1080);
+        labelBg.setOpaque(true);
         add(labelBg);
     }
 
@@ -58,21 +60,16 @@ public class GUI_BatallaNaval extends JFrame {
         //headerProject = new Header("Header ...", Color.BLACK);
         //this.add(headerProject,BorderLayout.NORTH); //Change this line if you change JFrame Container's Layout
 
-        //bg
-        labelBg = new JLabel();
-        bg = new ImageIcon(getClass().getResource(PATH+"bg.jpg"));
-        labelBg.setIcon(bg);
-        //this.add(labelBg);
-
         //tablero
         labelTablero = new JLabel();
         tablero = new ImageIcon(getClass().getResource(PATH+"table-visual.jpg"));
         labelTablero.setIcon(tablero);
-        //this.add(labelTablero);
+        //add(labelTablero);
 
         //panelBotones
         panelBotones = new JPanel();
         panelBotones.setLayout(new GridLayout(2,1));
+        panelBotones.setOpaque(false);
 
         //botonPVP
         imagen = new ImageIcon(getClass().getResource(PATH+"play-pvp.png"));
@@ -88,6 +85,9 @@ public class GUI_BatallaNaval extends JFrame {
         botonPVC.setContentAreaFilled(false);
         botonPVC.addActionListener(escucha);
 
+        panelBotones.add(botonPVP);
+        panelBotones.add(botonPVC);
+
         //panelLogo
         labelLogo = new JLabel();
         logo = new ImageIcon(getClass().getResource(PATH+"logo.png"));
@@ -96,14 +96,15 @@ public class GUI_BatallaNaval extends JFrame {
         labelLogo.setIcon(logo);
         panelLogo = new JPanel();
         panelLogo.add(labelLogo);
-        panelLogo.setBackground(null);
+        panelLogo.setOpaque(false);
 
-        panelBotones.add(botonPVP);
-        panelBotones.add(botonPVC);
-
-        add(panelLogo,BorderLayout.CENTER);
-        add(panelBotones,BorderLayout.SOUTH);
-
+        //Panel donde iran los botones y el logo
+        panelMain = new JPanel();
+        panelMain.setLayout(new GridLayout(3,1));
+        panelMain.add(panelLogo);
+        panelMain.add(panelBotones);
+        panelMain.setOpaque(false);
+        add(panelMain,BorderLayout.CENTER);
     }
 
     /**
