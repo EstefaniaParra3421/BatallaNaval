@@ -17,7 +17,7 @@ public class GUI_BatallaNaval extends JFrame {
     //Botones
     private JButton botonPVP, botonPVC;
     private Header headerProject;
-    private JPanel panelTablero, panelBotones, panelLogo, panelMain;
+    private JPanel panelBotones, panelLogo, panelMain, panelPrin, panelPos, panelPlayer, panelComputer;
     private ImageIcon tablero, bg, logo, imagen;
     private JLabel labelTablero, labelBg, labelLogo;
     private Escucha escucha;
@@ -48,6 +48,84 @@ public class GUI_BatallaNaval extends JFrame {
         add(labelBg);
     }
 
+    private void ventanaPVP(){
+        panelMain.setVisible(false);
+        labelBg.setVisible(false);
+        setResizable(false);
+
+        //tablero principal
+        headerProject = new Header("TABLERO PRINCIPAL", Color.BLACK, new Font("Berlin Sans FB", Font.BOLD,15));
+        labelTablero = new JLabel();
+        tablero = new ImageIcon(getClass().getResource(PATH+"table-visual.jpg"));
+        labelTablero.setIcon(tablero);
+
+        //Panel principal
+        panelPrin = new JPanel();
+        panelPrin.setLayout(new BorderLayout());
+        panelPrin.add(headerProject, BorderLayout.NORTH);
+        panelPrin.add(labelTablero);
+
+        //tablero de posicion
+        headerProject = new Header("TABLERO DE POSICION", Color.BLACK, new Font("Berlin Sans FB", Font.BOLD,15));
+        labelTablero = new JLabel();
+        tablero = new ImageIcon(getClass().getResource(PATH+"table-visual.jpg"));
+        labelTablero.setIcon(tablero);
+
+        //Panel de posicion
+        panelPos = new JPanel();
+        panelPos.setLayout(new BorderLayout());
+        panelPos.add(headerProject, BorderLayout.NORTH);
+        panelPos.add(labelTablero);
+
+        //Panel de tablero principal y de posicion
+        panelPlayer = new JPanel();
+        panelPlayer.setLayout(new GridLayout(1,2));
+        panelPlayer.add(panelPrin);
+        panelPlayer.add(panelPos);
+
+        add(panelPlayer);
+        pack();
+    }
+
+    private void ventanaPVC(){
+        panelMain.setVisible(false);
+        labelBg.setVisible(false);
+        setResizable(false);
+
+        //tablero principal
+        headerProject = new Header("TABLERO PRINCIPAL", Color.BLACK, new Font("Berlin Sans FB", Font.BOLD,15));
+        labelTablero = new JLabel();
+        tablero = new ImageIcon(getClass().getResource(PATH+"table-visual.jpg"));
+        labelTablero.setIcon(tablero);
+
+        //Panel principal
+        panelPrin = new JPanel();
+        panelPrin.setLayout(new BorderLayout());
+        panelPrin.add(headerProject, BorderLayout.NORTH);
+        panelPrin.add(labelTablero);
+
+        //tablero de posicion
+        headerProject = new Header("TABLERO DE POSICION", Color.BLACK, new Font("Berlin Sans FB", Font.BOLD,15));
+        labelTablero = new JLabel();
+        tablero = new ImageIcon(getClass().getResource(PATH+"table-visual.jpg"));
+        labelTablero.setIcon(tablero);
+
+        //Panel de posicion
+        panelPos = new JPanel();
+        panelPos.setLayout(new BorderLayout());
+        panelPos.add(headerProject, BorderLayout.NORTH);
+        panelPos.add(labelTablero);
+
+        //Panel de tablero principal y de posicion
+        panelComputer = new JPanel();
+        panelComputer.setLayout(new GridLayout(1,2));
+        panelComputer.add(panelPrin);
+        panelComputer.add(panelPos);
+
+        add(panelComputer);
+        pack();
+    }
+
     /**
      * This method is used to set up the default JComponent Configuration,
      * create Listener and control Objects used for the GUI class
@@ -59,12 +137,6 @@ public class GUI_BatallaNaval extends JFrame {
         //Set up JComponents
         //headerProject = new Header("Header ...", Color.BLACK);
         //this.add(headerProject,BorderLayout.NORTH); //Change this line if you change JFrame Container's Layout
-
-        //tablero
-        labelTablero = new JLabel();
-        tablero = new ImageIcon(getClass().getResource(PATH+"table-visual.jpg"));
-        labelTablero.setIcon(tablero);
-        //add(labelTablero);
 
         //panelBotones
         panelBotones = new JPanel();
@@ -124,8 +196,13 @@ public class GUI_BatallaNaval extends JFrame {
     private class Escucha implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-
+        public void actionPerformed(ActionEvent objectEvent) {
+            if (objectEvent.getSource() == botonPVP) {
+                ventanaPVP();
+            }
+            if (objectEvent.getSource() == botonPVC) {
+                ventanaPVC();
+            }
         }
     }
 }

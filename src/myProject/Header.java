@@ -14,11 +14,11 @@ public class Header extends JLabel {
      * @param title String that contains Header text
      * @param colorBackground Color object to be assigned for the Header background
      */
-    public Header(String title, Color colorBackground){
+    public Header(String title, Color colorBackground, Font font){
         this.setText(title);
         this.setBackground(colorBackground);
         this.setForeground(new Color(255,255,255));
-        this.setFont(new Font(Font.DIALOG,Font.BOLD,20));
+        this.setFont(font);
         this.setHorizontalAlignment(JLabel.CENTER);
         this.setVerticalAlignment(JLabel.CENTER);
         this.setOpaque(true);
