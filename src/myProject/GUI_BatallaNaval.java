@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Objects;
 
 /**
  * This class is used for ...
@@ -14,13 +15,15 @@ import java.awt.event.ActionListener;
 public class GUI_BatallaNaval extends JFrame {
     public static final String PATH ="/resources/";
 
-    //Botones
+    //Botones del juego
     private JButton botonPVP, botonPVC;
+    private JButton matriz[][] = new JButton[11][11];
     private Header headerProject;
     private JPanel panelBotones, panelLogo, panelMain, panelPrin, panelPos, panelPlayer, panelComputer;
-    private ImageIcon tablero, bg, logo, imagen;
+    private ImageIcon tablero, bg, logo, imagen, mapa, image;
     private JLabel labelTablero, labelBg, labelLogo;
     private Escucha escucha;
+    private Celda[][] matrizCeldas = new Celda[11][11];
 
     /**
      * Constructor of GUI class
@@ -47,11 +50,60 @@ public class GUI_BatallaNaval extends JFrame {
         labelBg.setOpaque(true);
         add(labelBg);
     }
+    private void añadirLetras(Celda[][] celda, JPanel panel){
+        for(int i=1; i <=10; i++){
+            String letra = null;
+            celda[0][i].setBackground(Color.WHITE);
+
+            if(i==1){
+                letra = "A";
+            }else if (i==2){
+                letra = "B";
+            }
+            else if (i==3){
+                letra = "C";
+            }
+            else if (i==4){
+                letra = "D";
+            }
+            else if (i==5){
+                letra = "E";
+            }
+            else if (i==6){
+                letra = "F";
+            }
+            else if (i==7){
+                letra = "G";
+            }
+            else if (i==8){
+                letra = "H";
+            }
+            else if (i==9){
+                letra = "I";
+            }
+            else if (i==10){
+                letra = "J";
+            }
+            celda[0][i].setText(letra+"");
+            celda[0][i].removeActionListener(escucha);
+            panel.updateUI();
+        }
+    }
+
+    private void añadirNumeros(Celda[][] celda, JPanel panel){
+        for(int i=1; i <=10; i++){
+            celda[i][0].setBackground(Color.WHITE);
+            celda[i][0].setText(i+"");
+            celda[0][i].removeActionListener(escucha);
+            panel.updateUI();
+        }
+    }
 
     private void ventanaPVP(){
         panelMain.setVisible(false);
         labelBg.setVisible(false);
-        setResizable(false);
+        //setResizable(false);
+        mapa = new ImageIcon(getClass().getResource(PATH+"mapa.jpg"));
 
         //tablero principal
         headerProject = new Header("TABLERO PRINCIPAL", Color.BLACK, new Font("Berlin Sans FB", Font.BOLD,15));
@@ -61,9 +113,22 @@ public class GUI_BatallaNaval extends JFrame {
 
         //Panel principal
         panelPrin = new JPanel();
-        panelPrin.setLayout(new BorderLayout());
-        panelPrin.add(headerProject, BorderLayout.NORTH);
-        panelPrin.add(labelTablero);
+        panelPrin.setPreferredSize(new Dimension(600,400));
+        panelPrin.setBorder(BorderFactory.createTitledBorder("Tablero prinicipal"));
+        //Matriz del juego
+        for(int i=0; i < 11; i++){
+            for(int indice = 0; indice < 11; indice++){
+                //logica para dibujar posiciones
+                matrizCeldas[i][indice] = new Celda(i,indice,false);
+                matrizCeldas[i][indice].setBackground(Color.CYAN);
+                matrizCeldas[i][indice].setPreferredSize(new Dimension(48,27));
+                //pinta la matriz
+                panelPrin.add(matrizCeldas[i][indice]);
+            }
+        }
+
+        añadirLetras(matrizCeldas, panelPrin);
+        añadirNumeros(matrizCeldas, panelPrin);
 
         //tablero de posicion
         headerProject = new Header("TABLERO DE POSICION", Color.BLACK, new Font("Berlin Sans FB", Font.BOLD,15));
@@ -72,10 +137,24 @@ public class GUI_BatallaNaval extends JFrame {
         labelTablero.setIcon(tablero);
 
         //Panel de posicion
+
         panelPos = new JPanel();
-        panelPos.setLayout(new BorderLayout());
-        panelPos.add(headerProject, BorderLayout.NORTH);
-        panelPos.add(labelTablero);
+        panelPos.setPreferredSize(new Dimension(600,400));
+        panelPos.setBorder(BorderFactory.createTitledBorder("Tablero de posición"));
+        //Matriz del juego
+        for(int i=0; i < 11; i++){
+            for(int indice = 0; indice < 11; indice++){
+                //logica para dibujar posiciones
+                matrizCeldas[i][indice] = new Celda(i,indice,false);
+                matrizCeldas[i][indice].setBackground(Color.CYAN);
+                matrizCeldas[i][indice].setPreferredSize(new Dimension(48,27));
+                //pinta la matriz
+                panelPos.add(matrizCeldas[i][indice]);
+            }
+        }
+
+        añadirLetras(matrizCeldas, panelPos);
+        añadirNumeros(matrizCeldas, panelPos);
 
         //Panel de tablero principal y de posicion
         panelPlayer = new JPanel();
@@ -125,6 +204,7 @@ public class GUI_BatallaNaval extends JFrame {
         add(panelComputer);
         pack();
     }
+
 
     /**
      * This method is used to set up the default JComponent Configuration,
