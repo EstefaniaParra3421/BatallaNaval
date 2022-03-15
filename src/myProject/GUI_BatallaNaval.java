@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Objects;
+import java.util.Random;
 
 /**
  * This class is used for ...
@@ -16,14 +17,15 @@ public class GUI_BatallaNaval extends JFrame {
     public static final String PATH ="/resources/";
 
     //Botones del juego
-    private JButton botonPVP, botonPVC;
-    private JButton matriz[][] = new JButton[11][11];
+    private JButton botonPVP, botonPVC, mostrarPanel, empezarJuego;
     private Header headerProject;
-    private JPanel panelBotones, panelLogo, panelMain, panelPrin, panelPos, panelPlayer, panelComputer;
+    private JPanel panelBotones, panelLogo, panelMain, panelPrin, panelPos, panelPlayer, panelComputer, panelEnemigo, panelControlador;
     private ImageIcon tablero, bg, logo, imagen, mapa, image;
     private JLabel labelTablero, labelBg, labelLogo;
     private Escucha escucha;
-    private Celda[][] matrizCeldas = new Celda[11][11];
+    private Celda[][] matrizCeldasprincipales = new Celda[11][11];
+    private Celda[][] matrizCeldasPosicion = new Celda[11][11];
+    private Celda[][] matrizCeldasEnemigas = new Celda[11][11];
 
     /**
      * Constructor of GUI class
@@ -119,16 +121,18 @@ public class GUI_BatallaNaval extends JFrame {
         for(int i=0; i < 11; i++){
             for(int indice = 0; indice < 11; indice++){
                 //logica para dibujar posiciones
-                matrizCeldas[i][indice] = new Celda(i,indice,false);
-                matrizCeldas[i][indice].setBackground(Color.CYAN);
-                matrizCeldas[i][indice].setPreferredSize(new Dimension(48,27));
+                matrizCeldasprincipales[i][indice] = new Celda(i,indice,false);
+                matrizCeldasprincipales[i][indice].setBackground(Color.CYAN);
+                matrizCeldasprincipales[i][indice].setPreferredSize(new Dimension(48,27));
+                //agrega el escucha
+                matrizCeldasprincipales[i][indice].addActionListener(escucha);
                 //pinta la matriz
-                panelPrin.add(matrizCeldas[i][indice]);
+                panelPrin.add(matrizCeldasprincipales[i][indice]);
             }
         }
 
-        añadirLetras(matrizCeldas, panelPrin);
-        añadirNumeros(matrizCeldas, panelPrin);
+        añadirLetras(matrizCeldasprincipales, panelPrin);
+        añadirNumeros(matrizCeldasprincipales, panelPrin);
 
         //tablero de posicion
         headerProject = new Header("TABLERO DE POSICION", Color.BLACK, new Font("Berlin Sans FB", Font.BOLD,15));
@@ -145,22 +149,75 @@ public class GUI_BatallaNaval extends JFrame {
         for(int i=0; i < 11; i++){
             for(int indice = 0; indice < 11; indice++){
                 //logica para dibujar posiciones
-                matrizCeldas[i][indice] = new Celda(i,indice,false);
-                matrizCeldas[i][indice].setBackground(Color.CYAN);
-                matrizCeldas[i][indice].setPreferredSize(new Dimension(48,27));
+                matrizCeldasPosicion[i][indice] = new Celda(i,indice,false);
+                matrizCeldasPosicion[i][indice].setBackground(Color.CYAN);
+                matrizCeldasPosicion[i][indice].setPreferredSize(new Dimension(48,27));
+                //agrega el escucha
+                matrizCeldasPosicion[i][indice].addActionListener(escucha);
                 //pinta la matriz
-                panelPos.add(matrizCeldas[i][indice]);
+                panelPos.add(matrizCeldasPosicion[i][indice]);
             }
         }
 
-        añadirLetras(matrizCeldas, panelPos);
-        añadirNumeros(matrizCeldas, panelPos);
+        añadirLetras(matrizCeldasPosicion, panelPos);
+        añadirNumeros(matrizCeldasPosicion, panelPos);
 
-        //Panel de tablero principal y de posicion
+        //tablero de enemigo
+        headerProject = new Header("TABLERO ENEMIGO", Color.BLACK, new Font("Berlin Sans FB", Font.BOLD,15));
+        labelTablero = new JLabel();
+        tablero = new ImageIcon(getClass().getResource(PATH+"table-visual.jpg"));
+        labelTablero.setIcon(tablero);
+
+        //Panel de enemigo
+
+        panelEnemigo = new JPanel();
+        panelEnemigo.setPreferredSize(new Dimension(600,400));
+        panelEnemigo.setBorder(BorderFactory.createTitledBorder("Tablero enemigo"));
+        //Matriz del juego
+        for(int i=0; i < 11; i++){
+            for(int indice = 0; indice < 11; indice++){
+                //logica para dibujar posiciones
+                matrizCeldasEnemigas[i][indice] = new Celda(i,indice,false);
+                matrizCeldasEnemigas[i][indice].setBackground(Color.CYAN);
+                matrizCeldasEnemigas[i][indice].setPreferredSize(new Dimension(48,27));
+                //pinta la matriz
+                panelEnemigo.add(matrizCeldasEnemigas[i][indice]);
+                //pone los botones invisibles inicialmente
+                matrizCeldasEnemigas[i][indice].setVisible(false);
+            }
+        }
+
+        añadirLetras(matrizCeldasEnemigas, panelEnemigo);
+        añadirNumeros(matrizCeldasEnemigas, panelEnemigo);
+
+        panelControlador = new JPanel();
+        panelControlador.setPreferredSize(new Dimension(600,400));
+        panelControlador.setBorder(BorderFactory.createTitledBorder("Tablero controlador"));
+        mostrarPanel = new JButton();
+        mostrarPanel.setBackground(Color.CYAN);
+        mostrarPanel.setText("Mostrar panel enemigo");
+        //agrega el escucha
+        mostrarPanel.addActionListener(escucha);
+
+        empezarJuego = new JButton();
+        empezarJuego.setBackground(Color.CYAN);
+        empezarJuego.setText("Iniciar juego");
+        //agrega el escucha
+        empezarJuego.addActionListener(escucha);
+
+        //pinta los botones en el panel controlador
+
+        panelControlador.add(empezarJuego);
+        panelControlador.add(mostrarPanel);
+
+        //Pinta los paneles en la pantalla
         panelPlayer = new JPanel();
-        panelPlayer.setLayout(new GridLayout(1,2));
-        panelPlayer.add(panelPrin);
+        panelPlayer.setLayout(new GridLayout(2,2));
+
         panelPlayer.add(panelPos);
+        panelPlayer.add(panelPrin);
+        panelPlayer.add(panelEnemigo);
+        panelPlayer.add(panelControlador);
 
         add(panelPlayer);
         pack();
@@ -195,6 +252,18 @@ public class GUI_BatallaNaval extends JFrame {
         panelPos.add(headerProject, BorderLayout.NORTH);
         panelPos.add(labelTablero);
 
+        //tablero del enemigo
+        headerProject = new Header("TABLERO ENEMIGO", Color.BLACK, new Font("Berlin Sans FB", Font.BOLD,15));
+        labelTablero = new JLabel();
+        tablero = new ImageIcon(getClass().getResource(PATH+"table-visual.jpg"));
+        labelTablero.setIcon(tablero);
+
+        //Panel de posicion
+        panelPos = new JPanel();
+        panelPos.setLayout(new BorderLayout());
+        panelPos.add(headerProject, BorderLayout.NORTH);
+        panelPos.add(labelTablero);
+
         //Panel de tablero principal y de posicion
         panelComputer = new JPanel();
         panelComputer.setLayout(new GridLayout(1,2));
@@ -203,6 +272,187 @@ public class GUI_BatallaNaval extends JFrame {
 
         add(panelComputer);
         pack();
+    }
+
+    public void movimientosEnemigo(JPanel panel, Celda[][] matrizCeldas){
+        Random random = new Random();
+        //Crea aleatoriamente el indice de los barcos
+        int indice1 = random.nextInt(10)+1;
+        int indice2 = random.nextInt(10)+1;
+        //indica aleatoriamente si el barco va a estar en posición vertical u horizontal
+        //1 = vertical, 2 = horizontal
+        int indicaPosicion = random.nextInt(2)+1;
+        int flagEnemigo = 1, espacio = 0, primeraVez =1;
+
+        if (flagEnemigo == 1) {
+
+            if (indicaPosicion == 1) {
+                if (matrizCeldas[indice1][indice2].getFilas() == 1 || matrizCeldas[indice1][indice2].getFilas() == 2 || matrizCeldas[indice1][indice2].getFilas() == 3) {
+                    matrizCeldas[indice1][indice2].setBackground(Color.BLUE);
+                    matrizCeldas[indice1][indice2].setAreaUtilizada(true);
+                    matrizCeldas[indice1 + 1][indice2].setBackground(Color.BLUE);
+                    matrizCeldas[indice1 + 1][indice2].setAreaUtilizada(true);
+                    matrizCeldas[indice1 + 2][indice2].setBackground(Color.BLUE);
+                    matrizCeldas[indice1 + 2][indice2].setAreaUtilizada(true);
+                    matrizCeldas[indice1 + 3][indice2].setBackground(Color.BLUE);
+                    matrizCeldas[indice1 + 3][indice2].setAreaUtilizada(true);
+                    flagEnemigo++;
+                    panel.updateUI();
+                }
+                if (matrizCeldas[indice1][indice2].getFilas() > 3 && matrizCeldas[indice1][indice2].getFilas() <= 10) {
+                    matrizCeldas[indice1][indice2].setBackground(Color.BLUE);
+                    matrizCeldas[indice1][indice2].setAreaUtilizada(true);
+                    matrizCeldas[indice1 - 1][indice2].setBackground(Color.BLUE);
+                    matrizCeldas[indice1 - 1][indice2].setAreaUtilizada(true);
+                    matrizCeldas[indice1 - 2][indice2].setBackground(Color.BLUE);
+                    matrizCeldas[indice1 - 2][indice2].setAreaUtilizada(true);
+                    matrizCeldas[indice1 - 3][indice2].setBackground(Color.BLUE);
+                    matrizCeldas[indice1 - 3][indice2].setAreaUtilizada(true);
+                    flagEnemigo++;
+                    panel.updateUI();
+                }
+            } else if (indicaPosicion == 2) {
+                if (matrizCeldas[indice1][indice2].getFilas() >= 1 && matrizCeldas[indice1][indice2].getFilas() < 8) {
+                    matrizCeldas[indice1][indice2].setBackground(Color.BLUE);
+                    matrizCeldas[indice1][indice2].setAreaUtilizada(true);
+                    matrizCeldas[indice1][indice2 + 1].setBackground(Color.BLUE);
+                    matrizCeldas[indice1][indice2 + 1].setAreaUtilizada(true);
+                    matrizCeldas[indice1][indice2 + 2].setBackground(Color.BLUE);
+                    matrizCeldas[indice1][indice2 + 2].setAreaUtilizada(true);
+                    matrizCeldas[indice1][indice2 + 3].setBackground(Color.BLUE);
+                    matrizCeldas[indice1][indice2 + 3].setAreaUtilizada(true);
+                    flagEnemigo++;
+                    panel.updateUI();
+                }
+                if (matrizCeldas[indice1][indice2].getFilas() >= 8 && matrizCeldas[indice1][indice2].getFilas() <= 10) {
+                    matrizCeldas[indice1][indice2].setBackground(Color.BLUE);
+                    matrizCeldas[indice1][indice2].setAreaUtilizada(true);
+                    matrizCeldas[indice1][indice2 - 1].setBackground(Color.BLUE);
+                    matrizCeldas[indice1][indice2 - 1].setAreaUtilizada(true);
+                    matrizCeldas[indice1][indice2 - 2].setBackground(Color.BLUE);
+                    matrizCeldas[indice1][indice2 - 2].setAreaUtilizada(true);
+                    matrizCeldas[indice1][indice2 - 3].setBackground(Color.BLUE);
+                    matrizCeldas[indice1][indice2 - 3].setAreaUtilizada(true);
+                    flagEnemigo++;
+                    panel.updateUI();
+                }
+            }
+
+        }
+        if (flagEnemigo == 2) {
+            if(primeraVez >= 1) {
+                if (indicaPosicion == 1) {
+                    if (matrizCeldas[indice1][indice2].getFilas() == 1 || matrizCeldas[indice1][indice2].getFilas() == 2 || matrizCeldas[indice1][indice2].getFilas() == 3) {
+                        matrizCeldas[indice1][indice2].setBackground(Color.GREEN);
+                        matrizCeldas[indice1][indice2].setAreaUtilizada(true);
+                        matrizCeldas[indice1 + 1][indice2].setBackground(Color.GREEN);
+                        matrizCeldas[indice1 + 1][indice2].setAreaUtilizada(true);
+                        matrizCeldas[indice1 + 2][indice2].setBackground(Color.GREEN);
+                        matrizCeldas[indice1 + 2][indice2].setAreaUtilizada(true);
+                        espacio++;
+                        panel.updateUI();
+                    }
+                    if (matrizCeldas[indice1][indice2].getFilas() > 3 && matrizCeldas[indice1][indice2].getFilas() <= 10) {
+                        matrizCeldas[indice1][indice2].setBackground(Color.GREEN);
+                        matrizCeldas[indice1][indice2].setAreaUtilizada(true);
+                        matrizCeldas[indice1 - 1][indice2].setBackground(Color.GREEN);
+                        matrizCeldas[indice1 - 1][indice2].setAreaUtilizada(true);
+                        matrizCeldas[indice1 - 2][indice2].setBackground(Color.GREEN);
+                        matrizCeldas[indice1 - 2][indice2].setAreaUtilizada(true);
+                        espacio++;
+                        panel.updateUI();
+                    }
+                } else if (indicaPosicion == 2) {
+                    if (matrizCeldas[indice1][indice2].getFilas() >= 1 && matrizCeldas[indice1][indice2].getFilas() < 8) {
+                        matrizCeldas[indice1][indice2].setBackground(Color.GREEN);
+                        matrizCeldas[indice1][indice2].setAreaUtilizada(true);
+                        matrizCeldas[indice1][indice2 + 1].setBackground(Color.GREEN);
+                        matrizCeldas[indice1][indice2 + 1].setAreaUtilizada(true);
+                        matrizCeldas[indice1][indice2 + 2].setBackground(Color.GREEN);
+                        matrizCeldas[indice1][indice2 + 2].setAreaUtilizada(true);
+                        espacio++;
+                        panel.updateUI();
+                    }
+                    if (matrizCeldas[indice1][indice2].getFilas() >= 8 && matrizCeldas[indice1][indice2].getFilas() <= 10) {
+                        matrizCeldas[indice1][indice2].setBackground(Color.GREEN);
+                        matrizCeldas[indice1][indice2].setAreaUtilizada(true);
+                        matrizCeldas[indice1][indice2 - 1].setBackground(Color.GREEN);
+                        matrizCeldas[indice1][indice2 - 1].setAreaUtilizada(true);
+                        matrizCeldas[indice1][indice2 - 2].setBackground(Color.GREEN);
+                        matrizCeldas[indice1][indice2 - 2].setAreaUtilizada(true);
+                        espacio++;
+                        panel.updateUI();
+                    }
+                }
+            }
+            primeraVez ++;
+            if(espacio == 2) {
+                flagEnemigo++;
+                espacio = 0;
+                primeraVez = 0;
+            }
+        }
+        if (flagEnemigo == 3) {
+            if(primeraVez >= 1) {
+
+                if (indicaPosicion == 1) {
+                    if (matrizCeldas[indice1][indice2].getFilas() == 1 || matrizCeldas[indice1][indice2].getFilas() == 2 || matrizCeldas[indice1][indice2].getFilas() == 3) {
+                        matrizCeldas[indice1][indice2].setBackground(Color.MAGENTA);
+                        matrizCeldas[indice1][indice2].setAreaUtilizada(true);
+                        matrizCeldas[indice1 + 1][indice2].setBackground(Color.MAGENTA);
+                        matrizCeldas[indice1 + 1][indice2].setAreaUtilizada(true);
+                        espacio++;
+                        panel.updateUI();
+                    }
+                    if (matrizCeldas[indice1][indice2].getFilas() > 3 && matrizCeldas[indice1][indice2].getFilas() <= 10) {
+                        matrizCeldas[indice1][indice2].setBackground(Color.MAGENTA);
+                        matrizCeldas[indice1][indice2].setAreaUtilizada(true);
+                        matrizCeldas[indice1 - 1][indice2].setBackground(Color.MAGENTA);
+                        matrizCeldas[indice1 - 1][indice2].setAreaUtilizada(true);
+                        espacio++;
+                        panel.updateUI();
+                    }
+                } else if (indicaPosicion == 2) {
+                    if (matrizCeldas[indice1][indice2].getFilas() >= 1 && matrizCeldas[indice1][indice2].getFilas() < 8) {
+                        matrizCeldas[indice1][indice2].setBackground(Color.MAGENTA);
+                        matrizCeldas[indice1][indice2].setAreaUtilizada(true);
+                        matrizCeldas[indice1][indice2 + 1].setBackground(Color.MAGENTA);
+                        matrizCeldas[indice1][indice2 + 1].setAreaUtilizada(true);
+                        espacio++;
+                        panel.updateUI();
+                    }
+                    if (matrizCeldas[indice1][indice2].getFilas() >= 8 && matrizCeldas[indice1][indice2].getFilas() <= 10) {
+                        matrizCeldas[indice1][indice2].setBackground(Color.MAGENTA);
+                        matrizCeldas[indice1][indice2].setAreaUtilizada(true);
+                        matrizCeldas[indice1][indice2 - 1].setBackground(Color.MAGENTA);
+                        matrizCeldas[indice1][indice2 - 1].setAreaUtilizada(true);
+                        espacio++;
+                        panel.updateUI();
+                    }
+                }
+            }
+            primeraVez ++;
+            if(espacio == 3) {
+                flagEnemigo++;
+                espacio = 0;
+                primeraVez = 0;
+            }
+        }
+        if (flagEnemigo == 4) {
+            if(primeraVez >= 1) {
+                matrizCeldas[indice1][indice2].setBackground(Color.YELLOW);
+                matrizCeldas[indice1][indice2].setAreaUtilizada(true);
+                espacio++;
+                panel.updateUI();
+            }
+
+            primeraVez ++;
+            if(espacio == 4) {
+                flagEnemigo++;
+                espacio = 0;
+                primeraVez = 0;
+            }
+        }
     }
 
 
@@ -275,6 +525,9 @@ public class GUI_BatallaNaval extends JFrame {
      */
     private class Escucha implements ActionListener {
 
+        private int flag, primeraVez = 0, espacio;
+        private boolean juegoIniciado;
+
         @Override
         public void actionPerformed(ActionEvent objectEvent) {
             if (objectEvent.getSource() == botonPVP) {
@@ -282,6 +535,203 @@ public class GUI_BatallaNaval extends JFrame {
             }
             if (objectEvent.getSource() == botonPVC) {
                 ventanaPVC();
+            }
+            if(objectEvent.getSource() == empezarJuego){
+                JOptionPane.showMessageDialog(null, "¡Vamos a iniciar a pintar los barcos!");
+                flag = 1;
+                juegoIniciado = true;
+                empezarJuego.setEnabled(false);
+            }
+            if (objectEvent.getSource() == mostrarPanel){
+                for(int i=0; i < 11; i++){
+                    for(int indice = 0; indice < 11; indice++){
+                        matrizCeldasEnemigas[i][indice].setVisible(true);
+                    }
+                }
+            }else{
+                for(int i=0; i < 11; i++){
+                    for(int indice = 0; indice < 11; indice++){
+                        if(objectEvent.getSource() == matrizCeldasPosicion[i][indice]) {
+                            if(juegoIniciado == true) {
+                                if (flag == 1) {
+                                    int opcionUsuario = JOptionPane.showConfirmDialog(panelPos, "Si desea que el barco sea vertical presione: (SI) de lo contrario se pondrá en horizontal",
+                                            "Ventana electiva", JOptionPane.YES_NO_OPTION);
+                                    if (opcionUsuario == JOptionPane.YES_OPTION) {
+                                        if (matrizCeldasPosicion[i][indice].getFilas() == 1 || matrizCeldasPosicion[i][indice].getFilas() == 2 || matrizCeldasPosicion[i][indice].getFilas() == 3) {
+                                            matrizCeldasPosicion[i][indice].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
+                                            matrizCeldasPosicion[i + 1][indice].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i + 1][indice].setAreaUtilizada(true);
+                                            matrizCeldasPosicion[i + 2][indice].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i + 2][indice].setAreaUtilizada(true);
+                                            matrizCeldasPosicion[i + 3][indice].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i + 3][indice].setAreaUtilizada(true);
+                                            flag++;
+                                            panelPos.updateUI();
+                                        }
+                                        if (matrizCeldasPosicion[i][indice].getFilas() > 3 && matrizCeldasPosicion[i][indice].getFilas() <= 10) {
+                                            matrizCeldasPosicion[i][indice].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
+                                            matrizCeldasPosicion[i - 1][indice].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i - 1][indice].setAreaUtilizada(true);
+                                            matrizCeldasPosicion[i - 2][indice].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i - 2][indice].setAreaUtilizada(true);
+                                            matrizCeldasPosicion[i - 3][indice].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i - 3][indice].setAreaUtilizada(true);
+                                            flag++;
+                                            panelPos.updateUI();
+                                        }
+                                    } else if (opcionUsuario == JOptionPane.NO_OPTION) {
+                                        if (matrizCeldasPosicion[i][indice].getFilas() >= 1 && matrizCeldasPosicion[i][indice].getFilas() < 8) {
+                                            matrizCeldasPosicion[i][indice].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
+                                            matrizCeldasPosicion[i][indice + 1].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i][indice + 1].setAreaUtilizada(true);
+                                            matrizCeldasPosicion[i][indice + 2].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i][indice + 2].setAreaUtilizada(true);
+                                            matrizCeldasPosicion[i][indice + 3].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i][indice + 3].setAreaUtilizada(true);
+                                            flag++;
+                                            panelPos.updateUI();
+                                        }
+                                        if (matrizCeldasPosicion[i][indice].getFilas() >= 8 && matrizCeldasPosicion[i][indice].getFilas() <= 10) {
+                                            matrizCeldasPosicion[i][indice].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
+                                            matrizCeldasPosicion[i][indice - 1].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i][indice - 1].setAreaUtilizada(true);
+                                            matrizCeldasPosicion[i][indice - 2].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i][indice - 2].setAreaUtilizada(true);
+                                            matrizCeldasPosicion[i][indice - 3].setBackground(Color.BLUE);
+                                            matrizCeldasPosicion[i][indice - 3].setAreaUtilizada(true);
+                                            flag++;
+                                            panelPos.updateUI();
+                                        }
+                                    }
+
+                                }
+                                if (flag == 2) {
+                                    if(primeraVez >= 1) {
+                                        int opcionUsuario = JOptionPane.showConfirmDialog(panelPos, "Si desea que el barco sea vertical presione: (SI) de lo contrario se pondrá en horizontal",
+                                                "Ventana electiva", JOptionPane.YES_NO_OPTION);
+                                        if (opcionUsuario == JOptionPane.YES_OPTION) {
+                                            if (matrizCeldasPosicion[i][indice].getFilas() == 1 || matrizCeldasPosicion[i][indice].getFilas() == 2 || matrizCeldasPosicion[i][indice].getFilas() == 3) {
+                                                matrizCeldasPosicion[i][indice].setBackground(Color.GREEN);
+                                                matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
+                                                matrizCeldasPosicion[i + 1][indice].setBackground(Color.GREEN);
+                                                matrizCeldasPosicion[i + 1][indice].setAreaUtilizada(true);
+                                                matrizCeldasPosicion[i + 2][indice].setBackground(Color.GREEN);
+                                                matrizCeldasPosicion[i + 2][indice].setAreaUtilizada(true);
+                                                espacio++;
+                                                panelPos.updateUI();
+                                            }
+                                            if (matrizCeldasPosicion[i][indice].getFilas() > 3 && matrizCeldasPosicion[i][indice].getFilas() <= 10) {
+                                                matrizCeldasPosicion[i][indice].setBackground(Color.GREEN);
+                                                matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
+                                                matrizCeldasPosicion[i - 1][indice].setBackground(Color.GREEN);
+                                                matrizCeldasPosicion[i - 1][indice].setAreaUtilizada(true);
+                                                matrizCeldasPosicion[i - 2][indice].setBackground(Color.GREEN);
+                                                matrizCeldasPosicion[i - 2][indice].setAreaUtilizada(true);
+                                                espacio++;
+                                                panelPos.updateUI();
+                                            }
+                                        } else if (opcionUsuario == JOptionPane.NO_OPTION) {
+                                            if (matrizCeldasPosicion[i][indice].getFilas() >= 1 && matrizCeldasPosicion[i][indice].getFilas() < 8) {
+                                                matrizCeldasPosicion[i][indice].setBackground(Color.GREEN);
+                                                matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
+                                                matrizCeldasPosicion[i][indice + 1].setBackground(Color.GREEN);
+                                                matrizCeldasPosicion[i][indice + 1].setAreaUtilizada(true);
+                                                matrizCeldasPosicion[i][indice + 2].setBackground(Color.GREEN);
+                                                matrizCeldasPosicion[i][indice + 2].setAreaUtilizada(true);
+                                                espacio++;
+                                                panelPos.updateUI();
+                                            }
+                                            if (matrizCeldasPosicion[i][indice].getFilas() >= 8 && matrizCeldasPosicion[i][indice].getFilas() <= 10) {
+                                                matrizCeldasPosicion[i][indice].setBackground(Color.GREEN);
+                                                matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
+                                                matrizCeldasPosicion[i][indice - 1].setBackground(Color.GREEN);
+                                                matrizCeldasPosicion[i][indice - 1].setAreaUtilizada(true);
+                                                matrizCeldasPosicion[i][indice - 2].setBackground(Color.GREEN);
+                                                matrizCeldasPosicion[i][indice - 2].setAreaUtilizada(true);
+                                                espacio++;
+                                                panelPos.updateUI();
+                                            }
+                                        }
+                                    }
+                                    primeraVez ++;
+                                    if(espacio == 2) {
+                                        flag++;
+                                        espacio = 0;
+                                        primeraVez = 0;
+                                    }
+                                }
+                                if (flag == 3) {
+                                    if(primeraVez >= 1) {
+                                        int opcionUsuario = JOptionPane.showConfirmDialog(panelPos, "Si desea que el barco sea vertical presione: (SI) de lo contrario se pondrá en horizontal",
+                                                "Ventana electiva", JOptionPane.YES_NO_OPTION);
+                                        if (opcionUsuario == JOptionPane.YES_OPTION) {
+                                            if (matrizCeldasPosicion[i][indice].getFilas() == 1 || matrizCeldasPosicion[i][indice].getFilas() == 2 || matrizCeldasPosicion[i][indice].getFilas() == 3) {
+                                                matrizCeldasPosicion[i][indice].setBackground(Color.MAGENTA);
+                                                matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
+                                                matrizCeldasPosicion[i + 1][indice].setBackground(Color.MAGENTA);
+                                                matrizCeldasPosicion[i + 1][indice].setAreaUtilizada(true);
+                                                espacio++;
+                                                panelPos.updateUI();
+                                            }
+                                            if (matrizCeldasPosicion[i][indice].getFilas() > 3 && matrizCeldasPosicion[i][indice].getFilas() <= 10) {
+                                                matrizCeldasPosicion[i][indice].setBackground(Color.MAGENTA);
+                                                matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
+                                                matrizCeldasPosicion[i - 1][indice].setBackground(Color.MAGENTA);
+                                                matrizCeldasPosicion[i - 1][indice].setAreaUtilizada(true);
+                                                espacio++;
+                                                panelPos.updateUI();
+                                            }
+                                        } else if (opcionUsuario == JOptionPane.NO_OPTION) {
+                                            if (matrizCeldasPosicion[i][indice].getFilas() >= 1 && matrizCeldasPosicion[i][indice].getFilas() < 8) {
+                                                matrizCeldasPosicion[i][indice].setBackground(Color.MAGENTA);
+                                                matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
+                                                matrizCeldasPosicion[i][indice + 1].setBackground(Color.MAGENTA);
+                                                matrizCeldasPosicion[i][indice + 1].setAreaUtilizada(true);
+                                                espacio++;
+                                                panelPos.updateUI();
+                                            }
+                                            if (matrizCeldasPosicion[i][indice].getFilas() >= 8 && matrizCeldasPosicion[i][indice].getFilas() <= 10) {
+                                                matrizCeldasPosicion[i][indice].setBackground(Color.MAGENTA);
+                                                matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
+                                                matrizCeldasPosicion[i][indice - 1].setBackground(Color.MAGENTA);
+                                                matrizCeldasPosicion[i][indice - 1].setAreaUtilizada(true);
+                                                espacio++;
+                                                panelPos.updateUI();
+                                            }
+                                        }
+                                    }
+                                    primeraVez ++;
+                                    if(espacio == 3) {
+                                        flag++;
+                                        espacio = 0;
+                                        primeraVez = 0;
+                                    }
+                                }
+                                if (flag == 4) {
+                                    if(primeraVez >= 1) {
+                                        matrizCeldasPosicion[i][indice].setBackground(Color.YELLOW);
+                                        matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
+                                        espacio++;
+                                        panelPos.updateUI();
+                                     }
+
+                                    primeraVez ++;
+                                    if(espacio == 4) {
+                                        flag++;
+                                        espacio = 0;
+                                        primeraVez = 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+
             }
         }
     }
