@@ -2,6 +2,7 @@ package myProject;
 
 import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,12 +18,13 @@ public class GUI_BatallaNaval extends JFrame {
     public static final String PATH ="/resources/";
 
     //Botones del juego
-    private JButton botonPVP, botonPVC, mostrarPanel, empezarJuego;
+    private JButton botonPlay, botonHTP, mostrarPanel, empezarJuego;
     private Header headerProject;
-    private JPanel panelBotones, panelLogo, panelMain, panelPrin, panelPos, panelPlayer, panelComputer, panelEnemigo, panelControlador;
+    private JPanel panelBotones, panelLogo, panelMain, panelHTP, panelPrin, panelPos, panelPlayer, panelComputer, panelEnemigo, panelControlador;
     private ImageIcon tablero, bg, logo, imagen, tocado, agua, hundido;
     private JLabel labelTablero, labelBg, labelLogo;
     private Escucha escucha;
+    private JTextArea textoHTP;
     private Celda[][] matrizCeldasprincipales = new Celda[11][11];
     private Celda[][] matrizCeldasPosicion = new Celda[11][11];
     private Celda[][] matrizCeldasEnemigas = new Celda[11][11];
@@ -36,8 +38,8 @@ public class GUI_BatallaNaval extends JFrame {
 
         //Default JFrame configuration
         setTitle("Sea Battle");
-        //setSize(818,840);
-        pack();
+        setSize(818,840);
+        //pack();
         setResizable(true);
         setVisible(true);
         //Color de la ventana
@@ -53,6 +55,12 @@ public class GUI_BatallaNaval extends JFrame {
         labelBg.setOpaque(true);
         add(labelBg);
     }
+
+    /**
+     * Añade las letras a la primera fila sin incluir la primera casilla [0][0]
+     * @param celda
+     * @param panel
+     */
     private void añadirLetras(Celda[][] celda, JPanel panel){
         for(int i=1; i <=10; i++){
             String letra = null;
@@ -93,19 +101,28 @@ public class GUI_BatallaNaval extends JFrame {
         }
     }
 
+    /**
+     * Añade los numeros a la primera columna sin incluir la primera casilla [0][0]
+     * @param celda
+     * @param panel
+     */
     private void añadirNumeros(Celda[][] celda, JPanel panel){
         for(int i=1; i <=10; i++){
             celda[i][0].setBackground(Color.WHITE);
             celda[i][0].setText(i+"");
             celda[0][i].removeActionListener(escucha);
+            celda[0][0].setBackground(Color.WHITE);
             panel.updateUI();
         }
     }
 
-    private void ventanaPVP(){
+    /**
+     * Ventana que contiene la logica del juego, incluye los tableros del jugador y del enemigo
+     */
+    private void ventanaPlay(){
         panelMain.setVisible(false);
         labelBg.setVisible(false);
-        //setResizable(false);
+        setResizable(false);
         //les añade los valores a las imagenes utilizadas
         tocado = new ImageIcon(getClass().getResource(PATH+"hurt.png"));
         agua = new ImageIcon(getClass().getResource(PATH+"water.png"));
@@ -126,7 +143,7 @@ public class GUI_BatallaNaval extends JFrame {
             for(int indice = 0; indice < 11; indice++){
                 //logica para dibujar posiciones
                 matrizCeldasprincipales[i][indice] = new Celda(i,indice,false);
-                matrizCeldasprincipales[i][indice].setBackground(Color.CYAN);
+                matrizCeldasprincipales[i][indice].setBackground(new Color(11,119,158));
                 matrizCeldasprincipales[i][indice].setPreferredSize(new Dimension(48,27));
                 //agrega el escucha
                 matrizCeldasprincipales[i][indice].addActionListener(escucha);
@@ -145,7 +162,6 @@ public class GUI_BatallaNaval extends JFrame {
         labelTablero.setIcon(tablero);
 
         //Panel de posicion
-
         panelPos = new JPanel();
         panelPos.setPreferredSize(new Dimension(600,400));
         panelPos.setBorder(BorderFactory.createTitledBorder("Tablero de posición"));
@@ -154,7 +170,7 @@ public class GUI_BatallaNaval extends JFrame {
             for(int indice = 0; indice < 11; indice++){
                 //logica para dibujar posiciones
                 matrizCeldasPosicion[i][indice] = new Celda(i,indice,false);
-                matrizCeldasPosicion[i][indice].setBackground(Color.CYAN);
+                matrizCeldasPosicion[i][indice].setBackground(new Color(11,119,158));
                 matrizCeldasPosicion[i][indice].setPreferredSize(new Dimension(48,27));
                 //agrega el escucha
                 matrizCeldasPosicion[i][indice].addActionListener(escucha);
@@ -182,7 +198,7 @@ public class GUI_BatallaNaval extends JFrame {
             for(int indice = 0; indice < 11; indice++){
                 //logica para dibujar posiciones
                 matrizCeldasEnemigas[i][indice] = new Celda(i,indice,false);
-                matrizCeldasEnemigas[i][indice].setBackground(Color.CYAN);
+                matrizCeldasEnemigas[i][indice].setBackground(new Color(11,119,158));
                 matrizCeldasEnemigas[i][indice].setPreferredSize(new Dimension(48,27));
                 //pinta la matriz
                 panelEnemigo.add(matrizCeldasEnemigas[i][indice]);
@@ -198,13 +214,13 @@ public class GUI_BatallaNaval extends JFrame {
         panelControlador.setPreferredSize(new Dimension(600,400));
         panelControlador.setBorder(BorderFactory.createTitledBorder("Tablero controlador"));
         mostrarPanel = new JButton();
-        mostrarPanel.setBackground(Color.CYAN);
-        mostrarPanel.setText("Mostrar panel enemigo");
+        mostrarPanel.setBackground(new Color(11,119,158));
+        mostrarPanel.setText("Mostrar tablero enemigo");
         //agrega el escucha
         mostrarPanel.addActionListener(escucha);
 
         empezarJuego = new JButton();
-        empezarJuego.setBackground(Color.CYAN);
+        empezarJuego.setBackground(new Color(11,119,158));
         empezarJuego.setText("Iniciar juego");
         //agrega el escucha
         empezarJuego.addActionListener(escucha);
@@ -227,57 +243,42 @@ public class GUI_BatallaNaval extends JFrame {
         pack();
     }
 
-    private void ventanaPVC(){
+    /**
+     * Ventana que contiene el modo de uso del juego, como jugar y sus caracteristicas
+     */
+    private void ventanaHTP(){
         panelMain.setVisible(false);
         labelBg.setVisible(false);
-        setResizable(false);
+        //setResizable(false);
+        //setSize(818,840);
 
-        //tablero principal
-        headerProject = new Header("TABLERO PRINCIPAL", Color.BLACK, new Font("Berlin Sans FB", Font.BOLD,15));
-        labelTablero = new JLabel();
-        tablero = new ImageIcon(getClass().getResource(PATH+"table-visual.jpg"));
-        labelTablero.setIcon(tablero);
-
-        //Panel principal
-        panelPrin = new JPanel();
-        panelPrin.setLayout(new BorderLayout());
-        panelPrin.add(headerProject, BorderLayout.NORTH);
-        panelPrin.add(labelTablero);
-
-        //tablero de posicion
-        headerProject = new Header("TABLERO DE POSICION", Color.BLACK, new Font("Berlin Sans FB", Font.BOLD,15));
-        labelTablero = new JLabel();
-        tablero = new ImageIcon(getClass().getResource(PATH+"table-visual.jpg"));
-        labelTablero.setIcon(tablero);
-
-        //Panel de posicion
-        panelPos = new JPanel();
-        panelPos.setLayout(new BorderLayout());
-        panelPos.add(headerProject, BorderLayout.NORTH);
-        panelPos.add(labelTablero);
-
-        //tablero del enemigo
-        headerProject = new Header("TABLERO ENEMIGO", Color.BLACK, new Font("Berlin Sans FB", Font.BOLD,15));
-        labelTablero = new JLabel();
-        tablero = new ImageIcon(getClass().getResource(PATH+"table-visual.jpg"));
-        labelTablero.setIcon(tablero);
-
-        //Panel de posicion
-        panelPos = new JPanel();
-        panelPos.setLayout(new BorderLayout());
-        panelPos.add(headerProject, BorderLayout.NORTH);
-        panelPos.add(labelTablero);
-
-        //Panel de tablero principal y de posicion
-        panelComputer = new JPanel();
-        panelComputer.setLayout(new GridLayout(1,2));
-        panelComputer.add(panelPrin);
-        panelComputer.add(panelPos);
-
-        add(panelComputer);
+        panelHTP = new JPanel();
+        panelHTP.setBorder(BorderFactory.createTitledBorder(null, "HOW TO PLAY", TitledBorder.CENTER,
+                TitledBorder.CENTER, new Font("Berlin Sans FB", Font.PLAIN,40), new Color(255,219,0)));
+        //Configuracion para el textoHTPlay
+        textoHTP = new JTextArea(5, 5);
+        textoHTP.setText("The game consists of defeating all 10 enemy ships before the enemy defeats your 10 ships.\n" +
+                "To start, you must organize the ships on your position board, once the ships are organized, the game will begin.\n" +
+                "The enemy ships and yours, cover X number of squares, to be able to shoot the enemy ship, you choose a square on the main board,\n" +
+                "if a ship or part of a ship is in that square, it will be marked with a bomb,\n" +
+                "if you hit the shot you can shoot again until you miss, when you miss, it will be marked with an X.\n" +
+                "When you defeat a ship a Skull will appear which means you defeated an enemy ship.\n" +
+                "The game will continue until one of the two players runs out of fleet ships to play.\n" +
+                "Are you ready? See you in Sea Battle");
+        textoHTP.setBackground(null);
+        textoHTP.setFont(new Font("Berlin Sans FB", Font.PLAIN,20));
+        this.add(panelHTP);
+        //Agregar el texto al panel
+        panelHTP.add(textoHTP);
+        panelHTP.setBackground(new Color(11,119,158));
         pack();
     }
 
+    /**
+     * Se encarga de realizar los tiros del enemigo
+     * @param panel
+     * @param celdas
+     */
     public void disparosEnemigo(JPanel panel, Celda[][] celdas){
         Random random = new Random();
         int indice1 = random.nextInt(10)+1;
@@ -295,6 +296,11 @@ public class GUI_BatallaNaval extends JFrame {
 
     }
 
+    /**
+     * Se encarga de pintar los barcos del enemigo
+     * @param panel
+     * @param matrizCeldas
+     */
     public void movimientosEnemigo(JPanel panel, Celda[][] matrizCeldas){
         Random random = new Random();
 
@@ -534,22 +540,22 @@ public class GUI_BatallaNaval extends JFrame {
         panelBotones.setLayout(new GridLayout(2,1));
         panelBotones.setOpaque(false);
 
-        //botonPVP
-        imagen = new ImageIcon(getClass().getResource(PATH+"play-pvp.png"));
-        botonPVP = new JButton(imagen);
-        botonPVP.setBorder(null);
-        botonPVP.setContentAreaFilled(false);
-        botonPVP.addActionListener(escucha);
+        //botonPlay
+        imagen = new ImageIcon(getClass().getResource(PATH+"play.png"));
+        botonPlay = new JButton(imagen);
+        botonPlay.setBorder(null);
+        botonPlay.setContentAreaFilled(false);
+        botonPlay.addActionListener(escucha);
 
-        //botonPVC
-        imagen = new ImageIcon(getClass().getResource(PATH+"play-pvc.png"));
-        botonPVC = new JButton(imagen);
-        botonPVC.setBorder(null);
-        botonPVC.setContentAreaFilled(false);
-        botonPVC.addActionListener(escucha);
+        //botonHTP
+        imagen = new ImageIcon(getClass().getResource(PATH+"how-to-play.png"));
+        botonHTP = new JButton(imagen);
+        botonHTP.setBorder(null);
+        botonHTP.setContentAreaFilled(false);
+        botonHTP.addActionListener(escucha);
 
-        panelBotones.add(botonPVP);
-        panelBotones.add(botonPVC);
+        panelBotones.add(botonPlay);
+        panelBotones.add(botonHTP);
 
         //panelLogo
         labelLogo = new JLabel();
@@ -591,11 +597,11 @@ public class GUI_BatallaNaval extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent objectEvent) {
-            if (objectEvent.getSource() == botonPVP) {
-                ventanaPVP();
+            if (objectEvent.getSource() == botonPlay) {
+                ventanaPlay();
             }
-            if (objectEvent.getSource() == botonPVC) {
-                ventanaPVC();
+            if (objectEvent.getSource() == botonHTP) {
+                ventanaHTP();
             }
             if(objectEvent.getSource() == empezarJuego){
                 JOptionPane.showMessageDialog(null, "¡Vamos a iniciar a pintar los barcos!");

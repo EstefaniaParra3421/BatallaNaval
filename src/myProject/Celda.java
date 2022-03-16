@@ -7,6 +7,12 @@ public class Celda extends JButton {
     private boolean areaUtilizada;
     private String nombreBote;
 
+    /**
+     * Contructor de la clase celda
+     * @param filas
+     * @param columnas
+     * @param areaUtilizada
+     */
     public Celda(int filas, int columnas, boolean areaUtilizada){
         this.columnas = columnas;
         this.filas = filas;
