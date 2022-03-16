@@ -20,12 +20,13 @@ public class GUI_BatallaNaval extends JFrame {
     private JButton botonPVP, botonPVC, mostrarPanel, empezarJuego;
     private Header headerProject;
     private JPanel panelBotones, panelLogo, panelMain, panelPrin, panelPos, panelPlayer, panelComputer, panelEnemigo, panelControlador;
-    private ImageIcon tablero, bg, logo, imagen, mapa, image;
+    private ImageIcon tablero, bg, logo, imagen, tocado, agua, hundido;
     private JLabel labelTablero, labelBg, labelLogo;
     private Escucha escucha;
     private Celda[][] matrizCeldasprincipales = new Celda[11][11];
     private Celda[][] matrizCeldasPosicion = new Celda[11][11];
     private Celda[][] matrizCeldasEnemigas = new Celda[11][11];
+    private int flagEnemigo = 1, aciertos = 0, aciertosEnemigo = 0;
 
     /**
      * Constructor of GUI class
@@ -35,8 +36,8 @@ public class GUI_BatallaNaval extends JFrame {
 
         //Default JFrame configuration
         setTitle("Sea Battle");
-        setSize(818,840);
-        //pack();
+        //setSize(818,840);
+        pack();
         setResizable(true);
         setVisible(true);
         //Color de la ventana
@@ -105,7 +106,10 @@ public class GUI_BatallaNaval extends JFrame {
         panelMain.setVisible(false);
         labelBg.setVisible(false);
         //setResizable(false);
-        mapa = new ImageIcon(getClass().getResource(PATH+"mapa.jpg"));
+        //les añade los valores a las imagenes utilizadas
+        tocado = new ImageIcon(getClass().getResource(PATH+"hurt.png"));
+        agua = new ImageIcon(getClass().getResource(PATH+"water.png"));
+        hundido = new ImageIcon(getClass().getResource(PATH+"defeated.png"));
 
         //tablero principal
         headerProject = new Header("TABLERO PRINCIPAL", Color.BLACK, new Font("Berlin Sans FB", Font.BOLD,15));
@@ -274,20 +278,39 @@ public class GUI_BatallaNaval extends JFrame {
         pack();
     }
 
-    public void movimientosEnemigo(JPanel panel, Celda[][] matrizCeldas){
+    public void disparosEnemigo(JPanel panel, Celda[][] celdas){
         Random random = new Random();
-        //Crea aleatoriamente el indice de los barcos
         int indice1 = random.nextInt(10)+1;
         int indice2 = random.nextInt(10)+1;
-        //indica aleatoriamente si el barco va a estar en posición vertical u horizontal
-        //1 = vertical, 2 = horizontal
-        int indicaPosicion = random.nextInt(2)+1;
-        int flagEnemigo = 1, espacio = 0, primeraVez =1;
+        hundido = new ImageIcon(getClass().getResource(PATH+"hurt.png"));
+        if(celdas[indice1][indice2].isAreaUtilizada()){
+            celdas[indice1][indice2].setIcon(hundido);
+            panel.updateUI();
+            aciertosEnemigo++;
+        }
+        if(!celdas[indice1][indice2].isAreaUtilizada()){
+            celdas[indice1][indice2].setIcon(agua);
+            panel.updateUI();
+        }
+
+    }
+
+    public void movimientosEnemigo(JPanel panel, Celda[][] matrizCeldas){
+        Random random = new Random();
+
+        int espacio = 0, primeraVez =1;
+
 
         if (flagEnemigo == 1) {
-
+            //Crea aleatoriamente el indice de los barcos
+            int indice1 = random.nextInt(10)+1;
+            int indice2 = random.nextInt(10)+1;
+            //indica aleatoriamente si el barco va a estar en posición vertical u horizontal
+            //1 = posición vertical, 2 = posición horizontal
+            int indicaPosicion = random.nextInt(2)+1;
             if (indicaPosicion == 1) {
-                if (matrizCeldas[indice1][indice2].getFilas() == 1 || matrizCeldas[indice1][indice2].getFilas() == 2 || matrizCeldas[indice1][indice2].getFilas() == 3) {
+                if (matrizCeldas[indice1][indice2].getFilas() >= 1 && matrizCeldas[indice1][indice2].getFilas() <= 3 && !matrizCeldas[indice1][indice2].isAreaUtilizada()
+                        && !matrizCeldas[indice1 + 1][indice2].isAreaUtilizada() && !matrizCeldas[indice1 + 2][indice2].isAreaUtilizada() && !matrizCeldas[indice1 + 3][indice2].isAreaUtilizada()) {
                     matrizCeldas[indice1][indice2].setBackground(Color.BLUE);
                     matrizCeldas[indice1][indice2].setAreaUtilizada(true);
                     matrizCeldas[indice1 + 1][indice2].setBackground(Color.BLUE);
@@ -299,7 +322,8 @@ public class GUI_BatallaNaval extends JFrame {
                     flagEnemigo++;
                     panel.updateUI();
                 }
-                if (matrizCeldas[indice1][indice2].getFilas() > 3 && matrizCeldas[indice1][indice2].getFilas() <= 10) {
+                if (matrizCeldas[indice1][indice2].getFilas() > 3 && matrizCeldas[indice1][indice2].getFilas() <= 10  && !matrizCeldas[indice1][indice2].isAreaUtilizada()
+                        && !matrizCeldas[indice1 - 1][indice2].isAreaUtilizada() && !matrizCeldas[indice1 - 2][indice2].isAreaUtilizada() && !matrizCeldas[indice1 - 3][indice2].isAreaUtilizada()) {
                     matrizCeldas[indice1][indice2].setBackground(Color.BLUE);
                     matrizCeldas[indice1][indice2].setAreaUtilizada(true);
                     matrizCeldas[indice1 - 1][indice2].setBackground(Color.BLUE);
@@ -312,7 +336,8 @@ public class GUI_BatallaNaval extends JFrame {
                     panel.updateUI();
                 }
             } else if (indicaPosicion == 2) {
-                if (matrizCeldas[indice1][indice2].getFilas() >= 1 && matrizCeldas[indice1][indice2].getFilas() < 8) {
+                if (matrizCeldas[indice1][indice2].getColumnas() >= 1 && matrizCeldas[indice1][indice2].getColumnas() < 8  && !matrizCeldas[indice1][indice2].isAreaUtilizada()
+                        && !matrizCeldas[indice1][indice2 + 1].isAreaUtilizada() && !matrizCeldas[indice1][indice2 + 2].isAreaUtilizada() && !matrizCeldas[indice1][indice2 + 3].isAreaUtilizada()) {
                     matrizCeldas[indice1][indice2].setBackground(Color.BLUE);
                     matrizCeldas[indice1][indice2].setAreaUtilizada(true);
                     matrizCeldas[indice1][indice2 + 1].setBackground(Color.BLUE);
@@ -324,7 +349,8 @@ public class GUI_BatallaNaval extends JFrame {
                     flagEnemigo++;
                     panel.updateUI();
                 }
-                if (matrizCeldas[indice1][indice2].getFilas() >= 8 && matrizCeldas[indice1][indice2].getFilas() <= 10) {
+                if (matrizCeldas[indice1][indice2].getColumnas() >= 8 && matrizCeldas[indice1][indice2].getColumnas() <= 10  && !matrizCeldas[indice1][indice2].isAreaUtilizada()
+                        && !matrizCeldas[indice1][indice2 - 1].isAreaUtilizada() && !matrizCeldas[indice1][indice2 - 2].isAreaUtilizada() && !matrizCeldas[indice1][indice2 - 3].isAreaUtilizada()) {
                     matrizCeldas[indice1][indice2].setBackground(Color.BLUE);
                     matrizCeldas[indice1][indice2].setAreaUtilizada(true);
                     matrizCeldas[indice1][indice2 - 1].setBackground(Color.BLUE);
@@ -340,9 +366,21 @@ public class GUI_BatallaNaval extends JFrame {
 
         }
         if (flagEnemigo == 2) {
-            if(primeraVez >= 1) {
+
+            while(espacio < 2) {
+                //Crea aleatoriamente el indice de los barcos
+                int indice1 = random.nextInt(10)+1;
+                int indice2 = random.nextInt(10)+1;
+                while(matrizCeldas[indice1][indice2].isAreaUtilizada()){
+                    indice1 = random.nextInt(10)+1;
+                    indice2 = random.nextInt(10)+1;
+                }
+                //indica aleatoriamente si el barco va a estar en posición vertical u horizontal
+                //1 = posición vertical, 2 = posición horizontal
+                int indicaPosicion = random.nextInt(2)+1;
                 if (indicaPosicion == 1) {
-                    if (matrizCeldas[indice1][indice2].getFilas() == 1 || matrizCeldas[indice1][indice2].getFilas() == 2 || matrizCeldas[indice1][indice2].getFilas() == 3) {
+                    if (matrizCeldas[indice1][indice2].getFilas() >= 1 && matrizCeldas[indice1][indice2].getFilas() <= 3 && !matrizCeldas[indice1][indice2].isAreaUtilizada()
+                            && !matrizCeldas[indice1 + 1][indice2].isAreaUtilizada() && !matrizCeldas[indice1 + 2][indice2].isAreaUtilizada() ) {
                         matrizCeldas[indice1][indice2].setBackground(Color.GREEN);
                         matrizCeldas[indice1][indice2].setAreaUtilizada(true);
                         matrizCeldas[indice1 + 1][indice2].setBackground(Color.GREEN);
@@ -352,7 +390,8 @@ public class GUI_BatallaNaval extends JFrame {
                         espacio++;
                         panel.updateUI();
                     }
-                    if (matrizCeldas[indice1][indice2].getFilas() > 3 && matrizCeldas[indice1][indice2].getFilas() <= 10) {
+                    if (matrizCeldas[indice1][indice2].getFilas() > 3 && matrizCeldas[indice1][indice2].getFilas() <= 10  && !matrizCeldas[indice1][indice2].isAreaUtilizada()
+                            && !matrizCeldas[indice1 - 1][indice2].isAreaUtilizada() && !matrizCeldas[indice1 - 2][indice2].isAreaUtilizada() ) {
                         matrizCeldas[indice1][indice2].setBackground(Color.GREEN);
                         matrizCeldas[indice1][indice2].setAreaUtilizada(true);
                         matrizCeldas[indice1 - 1][indice2].setBackground(Color.GREEN);
@@ -363,7 +402,8 @@ public class GUI_BatallaNaval extends JFrame {
                         panel.updateUI();
                     }
                 } else if (indicaPosicion == 2) {
-                    if (matrizCeldas[indice1][indice2].getFilas() >= 1 && matrizCeldas[indice1][indice2].getFilas() < 8) {
+                    if (matrizCeldas[indice1][indice2].getColumnas() >= 1 && matrizCeldas[indice1][indice2].getColumnas() < 8  && !matrizCeldas[indice1][indice2].isAreaUtilizada()
+                            && !matrizCeldas[indice1][indice2 + 1].isAreaUtilizada() && !matrizCeldas[indice1][indice2 + 1].isAreaUtilizada() ) {
                         matrizCeldas[indice1][indice2].setBackground(Color.GREEN);
                         matrizCeldas[indice1][indice2].setAreaUtilizada(true);
                         matrizCeldas[indice1][indice2 + 1].setBackground(Color.GREEN);
@@ -373,7 +413,8 @@ public class GUI_BatallaNaval extends JFrame {
                         espacio++;
                         panel.updateUI();
                     }
-                    if (matrizCeldas[indice1][indice2].getFilas() >= 8 && matrizCeldas[indice1][indice2].getFilas() <= 10) {
+                    if (matrizCeldas[indice1][indice2].getColumnas() >= 8 && matrizCeldas[indice1][indice2].getColumnas() <= 10  && !matrizCeldas[indice1][indice2].isAreaUtilizada()
+                            && !matrizCeldas[indice1][indice2 - 1].isAreaUtilizada() && !matrizCeldas[indice1][indice2 - 2].isAreaUtilizada() ) {
                         matrizCeldas[indice1][indice2].setBackground(Color.GREEN);
                         matrizCeldas[indice1][indice2].setAreaUtilizada(true);
                         matrizCeldas[indice1][indice2 - 1].setBackground(Color.GREEN);
@@ -385,18 +426,28 @@ public class GUI_BatallaNaval extends JFrame {
                     }
                 }
             }
-            primeraVez ++;
             if(espacio == 2) {
                 flagEnemigo++;
                 espacio = 0;
-                primeraVez = 0;
             }
         }
         if (flagEnemigo == 3) {
-            if(primeraVez >= 1) {
+            //Crea aleatoriamente el indice de los barcos
+            while(espacio < 3) {
+                //Crea aleatoriamente el indice de los barcos
+                int indice1 = random.nextInt(10)+1;
+                int indice2 = random.nextInt(10)+1;
+                while(matrizCeldas[indice1][indice2].isAreaUtilizada()){
+                    indice1 = random.nextInt(10)+1;
+                    indice2 = random.nextInt(10)+1;
+                }
+                //indica aleatoriamente si el barco va a estar en posición vertical u horizontal
+                //1 = posición vertical, 2 = posición horizontal
+                int indicaPosicion = random.nextInt(2)+1;
 
                 if (indicaPosicion == 1) {
-                    if (matrizCeldas[indice1][indice2].getFilas() == 1 || matrizCeldas[indice1][indice2].getFilas() == 2 || matrizCeldas[indice1][indice2].getFilas() == 3) {
+                    if (matrizCeldas[indice1][indice2].getFilas() >= 1 && matrizCeldas[indice1][indice2].getFilas() <= 3 && !matrizCeldas[indice1][indice2].isAreaUtilizada()
+                            && !matrizCeldas[indice1 + 1][indice2].isAreaUtilizada()) {
                         matrizCeldas[indice1][indice2].setBackground(Color.MAGENTA);
                         matrizCeldas[indice1][indice2].setAreaUtilizada(true);
                         matrizCeldas[indice1 + 1][indice2].setBackground(Color.MAGENTA);
@@ -404,7 +455,8 @@ public class GUI_BatallaNaval extends JFrame {
                         espacio++;
                         panel.updateUI();
                     }
-                    if (matrizCeldas[indice1][indice2].getFilas() > 3 && matrizCeldas[indice1][indice2].getFilas() <= 10) {
+                    if (matrizCeldas[indice1][indice2].getFilas() > 3 && matrizCeldas[indice1][indice2].getFilas() <= 10 && !matrizCeldas[indice1][indice2].isAreaUtilizada()
+                            && !matrizCeldas[indice1 - 1][indice2].isAreaUtilizada()) {
                         matrizCeldas[indice1][indice2].setBackground(Color.MAGENTA);
                         matrizCeldas[indice1][indice2].setAreaUtilizada(true);
                         matrizCeldas[indice1 - 1][indice2].setBackground(Color.MAGENTA);
@@ -413,7 +465,9 @@ public class GUI_BatallaNaval extends JFrame {
                         panel.updateUI();
                     }
                 } else if (indicaPosicion == 2) {
-                    if (matrizCeldas[indice1][indice2].getFilas() >= 1 && matrizCeldas[indice1][indice2].getFilas() < 8) {
+                    if (matrizCeldas[indice1][indice2].getColumnas() >= 1 && matrizCeldas[indice1][indice2].getColumnas() < 8 && !matrizCeldas[indice1][indice2].isAreaUtilizada()
+                            && !matrizCeldas[indice1][indice2 + 1].isAreaUtilizada()) {
+
                         matrizCeldas[indice1][indice2].setBackground(Color.MAGENTA);
                         matrizCeldas[indice1][indice2].setAreaUtilizada(true);
                         matrizCeldas[indice1][indice2 + 1].setBackground(Color.MAGENTA);
@@ -421,7 +475,8 @@ public class GUI_BatallaNaval extends JFrame {
                         espacio++;
                         panel.updateUI();
                     }
-                    if (matrizCeldas[indice1][indice2].getFilas() >= 8 && matrizCeldas[indice1][indice2].getFilas() <= 10) {
+                    if (matrizCeldas[indice1][indice2].getColumnas() >= 8 && matrizCeldas[indice1][indice2].getColumnas() <= 10 && !matrizCeldas[indice1][indice2].isAreaUtilizada()
+                            && !matrizCeldas[indice1 - 1][indice2].isAreaUtilizada()) {
                         matrizCeldas[indice1][indice2].setBackground(Color.MAGENTA);
                         matrizCeldas[indice1][indice2].setAreaUtilizada(true);
                         matrizCeldas[indice1][indice2 - 1].setBackground(Color.MAGENTA);
@@ -431,26 +486,32 @@ public class GUI_BatallaNaval extends JFrame {
                     }
                 }
             }
-            primeraVez ++;
             if(espacio == 3) {
                 flagEnemigo++;
                 espacio = 0;
-                primeraVez = 0;
             }
         }
         if (flagEnemigo == 4) {
-            if(primeraVez >= 1) {
-                matrizCeldas[indice1][indice2].setBackground(Color.YELLOW);
-                matrizCeldas[indice1][indice2].setAreaUtilizada(true);
-                espacio++;
-                panel.updateUI();
+            //Crea aleatoriamente el indice de los barcos
+            while(espacio < 4) {
+                //Crea aleatoriamente el indice de los barcos
+                int indice1 = random.nextInt(10)+1;
+                int indice2 = random.nextInt(10)+1;
+                while(matrizCeldas[indice1][indice2].isAreaUtilizada()){
+                    indice1 = random.nextInt(10)+1;
+                    indice2 = random.nextInt(10)+1;
+                }
+                if(!matrizCeldas[indice1][indice2].isAreaUtilizada()) {
+                    matrizCeldas[indice1][indice2].setBackground(Color.YELLOW);
+                    matrizCeldas[indice1][indice2].setAreaUtilizada(true);
+                    espacio++;
+                    panel.updateUI();
+                }
             }
 
-            primeraVez ++;
             if(espacio == 4) {
-                flagEnemigo++;
-                espacio = 0;
-                primeraVez = 0;
+                espacio = 4;
+                flagEnemigo ++;
             }
         }
     }
@@ -525,8 +586,8 @@ public class GUI_BatallaNaval extends JFrame {
      */
     private class Escucha implements ActionListener {
 
-        private int flag, primeraVez = 0, espacio;
-        private boolean juegoIniciado;
+        private int flag = 1, primeraVez = 0, espacio;
+        private boolean juegoIniciado, gano, ganoEnemigo;
 
         @Override
         public void actionPerformed(ActionEvent objectEvent) {
@@ -582,7 +643,7 @@ public class GUI_BatallaNaval extends JFrame {
                                             panelPos.updateUI();
                                         }
                                     } else if (opcionUsuario == JOptionPane.NO_OPTION) {
-                                        if (matrizCeldasPosicion[i][indice].getFilas() >= 1 && matrizCeldasPosicion[i][indice].getFilas() < 8) {
+                                        if (matrizCeldasPosicion[i][indice].getColumnas() >= 1 && matrizCeldasPosicion[i][indice].getColumnas() < 8) {
                                             matrizCeldasPosicion[i][indice].setBackground(Color.BLUE);
                                             matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
                                             matrizCeldasPosicion[i][indice + 1].setBackground(Color.BLUE);
@@ -594,7 +655,7 @@ public class GUI_BatallaNaval extends JFrame {
                                             flag++;
                                             panelPos.updateUI();
                                         }
-                                        if (matrizCeldasPosicion[i][indice].getFilas() >= 8 && matrizCeldasPosicion[i][indice].getFilas() <= 10) {
+                                        if (matrizCeldasPosicion[i][indice].getColumnas() >= 8 && matrizCeldasPosicion[i][indice].getColumnas() <= 10) {
                                             matrizCeldasPosicion[i][indice].setBackground(Color.BLUE);
                                             matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
                                             matrizCeldasPosicion[i][indice - 1].setBackground(Color.BLUE);
@@ -635,7 +696,7 @@ public class GUI_BatallaNaval extends JFrame {
                                                 panelPos.updateUI();
                                             }
                                         } else if (opcionUsuario == JOptionPane.NO_OPTION) {
-                                            if (matrizCeldasPosicion[i][indice].getFilas() >= 1 && matrizCeldasPosicion[i][indice].getFilas() < 8) {
+                                            if (matrizCeldasPosicion[i][indice].getColumnas() >= 1 && matrizCeldasPosicion[i][indice].getColumnas() < 8) {
                                                 matrizCeldasPosicion[i][indice].setBackground(Color.GREEN);
                                                 matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
                                                 matrizCeldasPosicion[i][indice + 1].setBackground(Color.GREEN);
@@ -645,7 +706,7 @@ public class GUI_BatallaNaval extends JFrame {
                                                 espacio++;
                                                 panelPos.updateUI();
                                             }
-                                            if (matrizCeldasPosicion[i][indice].getFilas() >= 8 && matrizCeldasPosicion[i][indice].getFilas() <= 10) {
+                                            if (matrizCeldasPosicion[i][indice].getColumnas() >= 8 && matrizCeldasPosicion[i][indice].getColumnas()<= 10) {
                                                 matrizCeldasPosicion[i][indice].setBackground(Color.GREEN);
                                                 matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
                                                 matrizCeldasPosicion[i][indice - 1].setBackground(Color.GREEN);
@@ -686,7 +747,7 @@ public class GUI_BatallaNaval extends JFrame {
                                                 panelPos.updateUI();
                                             }
                                         } else if (opcionUsuario == JOptionPane.NO_OPTION) {
-                                            if (matrizCeldasPosicion[i][indice].getFilas() >= 1 && matrizCeldasPosicion[i][indice].getFilas() < 8) {
+                                            if (matrizCeldasPosicion[i][indice].getColumnas() >= 1 && matrizCeldasPosicion[i][indice].getColumnas() < 8) {
                                                 matrizCeldasPosicion[i][indice].setBackground(Color.MAGENTA);
                                                 matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
                                                 matrizCeldasPosicion[i][indice + 1].setBackground(Color.MAGENTA);
@@ -694,7 +755,7 @@ public class GUI_BatallaNaval extends JFrame {
                                                 espacio++;
                                                 panelPos.updateUI();
                                             }
-                                            if (matrizCeldasPosicion[i][indice].getFilas() >= 8 && matrizCeldasPosicion[i][indice].getFilas() <= 10) {
+                                            if (matrizCeldasPosicion[i][indice].getColumnas() >= 8 && matrizCeldasPosicion[i][indice].getColumnas() <= 10) {
                                                 matrizCeldasPosicion[i][indice].setBackground(Color.MAGENTA);
                                                 matrizCeldasPosicion[i][indice].setAreaUtilizada(true);
                                                 matrizCeldasPosicion[i][indice - 1].setBackground(Color.MAGENTA);
@@ -726,9 +787,69 @@ public class GUI_BatallaNaval extends JFrame {
                                         primeraVez = 0;
                                     }
                                 }
+
                             }
                         }
                     }
+                }
+
+                if(flag == 5){
+                    movimientosEnemigo(panelEnemigo,matrizCeldasEnemigas);
+                    if(aciertosEnemigo == 20){
+                        ganoEnemigo = true;
+                    }
+                    if(aciertos == 20){
+                        gano = true;
+                    }
+
+                    if(!gano){
+                        for(int i=0; i < 11; i++) {
+                            for (int indice = 0; indice < 11; indice++) {
+                                if(objectEvent.getSource() == matrizCeldasprincipales[i][indice]){
+                                    if(matrizCeldasEnemigas[i][indice].isAreaUtilizada()){
+                                        matrizCeldasprincipales[i][indice].setIcon(tocado);
+                                        aciertos++;
+                                        System.out.println(aciertos);
+                                    }
+                                    if(!matrizCeldasEnemigas[i][indice].isAreaUtilizada()){
+                                        matrizCeldasprincipales[i][indice].setIcon(agua);
+                                    }
+                                }
+                            }
+                        }
+                        if(primeraVez >= 1){
+                            disparosEnemigo(panelPos, matrizCeldasPosicion);
+                        }
+                        primeraVez ++;
+                    }else{
+                        for(int i=0; i < 11; i++) {
+                            for (int indice = 0; indice < 11; indice++) {
+                                if(matrizCeldasEnemigas[i][indice].isAreaUtilizada()){
+                                    hundido = new ImageIcon(getClass().getResource(PATH+"defeated.png"));
+                                    matrizCeldasprincipales[i][indice].setIcon(hundido);
+                                    panelPrin.updateUI();
+
+                                }
+                            }
+
+                        }
+                        JOptionPane.showMessageDialog(null,"¡GANASTE!");
+                    }
+                    if(ganoEnemigo){
+                        for(int i=0; i < 11; i++) {
+                            for (int indice = 0; indice < 11; indice++) {
+                                if(matrizCeldasPosicion[i][indice].isAreaUtilizada()){
+                                    hundido = new ImageIcon(getClass().getResource(PATH+"defeated.png"));
+                                    matrizCeldasPosicion[i][indice].setIcon(hundido);
+                                    panelPos.updateUI();
+
+                                }
+                            }
+
+                        }
+                        JOptionPane.showMessageDialog(null,"¡PERDISTE!");
+                    }
+
                 }
 
 

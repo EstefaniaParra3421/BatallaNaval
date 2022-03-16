@@ -5,6 +5,7 @@ import javax.swing.*;
 public class Celda extends JButton {
     private int columnas, filas;
     private boolean areaUtilizada;
+    private String nombreBote;
 
     public Celda(int filas, int columnas, boolean areaUtilizada){
         this.columnas = columnas;
@@ -35,4 +36,5 @@ public class Celda extends JButton {
     public void setAreaUtilizada(boolean areaUtilizada) {
         this.areaUtilizada = areaUtilizada;
     }
+
 }
